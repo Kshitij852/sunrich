@@ -3,7 +3,7 @@ import React, { Component, createRef } from "react";
 
 import Editor from "./Editor";
 
-interface Props {}
+interface Props { }
 
 interface State {
   content: string;

@@ -1,11 +1,4 @@
-// import CodeMirror from "codemirror";
-// import katex from "katex";
 import "suneditor/dist/css/suneditor.min.css";
-
-// import "codemirror/mode/htmlmixed/htmlmixed";
-// import "codemirror/lib/codemirror.css";
-// import "katex/dist/katex.min.css";
-// import "./Editor.scss";
 import React, { Component, createRef } from "react";
 import plugins from "suneditor/src/plugins";
 import { en } from "suneditor/src/lang";
