@@ -14,7 +14,7 @@ const EditorPage = ({ editorId }: { editorId: string }) => {
     // Fetch content from the backend API
     const fetchContent = async (id: string) => {
         try {
-            const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzdlNTRlYWZmNzI0OGE2MThjODRiNzciLCJmaXJzdE5hbWUiOiJOaWtoaWwiLCJsYXN0TmFtZSI6IlNpbmdoIiwiZW1haWwiOiJOaWtoaWxAYXRvbW9zdGVjaC5jb20iLCJnSWQiOiI2NzNjMjdmZGJkZGEwOGE1NGU3NDU1ZDkiLCJpYXQiOjE3MzcwMDA4MjEsImV4cCI6MTczNzA4NzIyMX0.tlj-yJVw8_0mTV8r9bsHGoc1tPBxB3V4BPd8K3WlYgY'
+            const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzdlNTRlYWZmNzI0OGE2MThjODRiNzciLCJmaXJzdE5hbWUiOiJOaWtoaWwiLCJsYXN0TmFtZSI6IlNpbmdoIiwiZW1haWwiOiJOaWtoaWxAYXRvbW9zdGVjaC5jb20iLCJnSWQiOiI2NzNjMjdmZGJkZGEwOGE1NGU3NDU1ZDkiLCJpYXQiOjE3MzczNDg3NDQsImV4cCI6MTczNzQzNTE0NH0.uRMkQ0b56jNBgjs3INu6MNVmAiOUVIiX6tw0bHA4qqg'
             const response = await fetch(`http://localhost:7071/api/content/getProjectContentByProjectId/677e5536ff7248a618c84b81`, {
                 method: 'GET',
                 headers: {
