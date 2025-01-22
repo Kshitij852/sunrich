@@ -7,7 +7,7 @@ const Page = () => {
     const [data, setData] = useState<any[]>([]); // State to store API data
     const [loading, setLoading] = useState<boolean>(true); // Loading state
     const [error, setError] = useState<string | null>(null); // Error state
-    const [selectedPageId, setSelectedPageId] = useState<string | null>(null); // Selected page ID
+    const [selectedPageId, setSelectedPageId] = useState<number | null>(null); // Selected page ID
 
     useEffect(() => {
         const fetchData = async () => {
@@ -35,7 +35,7 @@ const Page = () => {
                 const result = await response.json();
                 if (result?.data) {
                     setData(result.data);
-                    console.log("result", result.data)
+                    console.log("Fetched data:", result.data);
                 } else {
                     throw new Error("Content is missing in the response.");
                 }
@@ -49,8 +49,8 @@ const Page = () => {
         fetchData();
     }, []);
 
-    const handlePageSelection = (pageId: string) => {
-        setSelectedPageId(pageId);
+    const handlePageSelection = (pageNo: number) => {
+        setSelectedPageId(pageNo);
     };
 
     return (
@@ -68,24 +68,21 @@ const Page = () => {
                 <div className="space-y-6">
                     {/* Page navigation buttons */}
                     <div className="flex flex-wrap justify-center gap-4">
-                        {data.map((page) => {
-                            console.log("Rendering button for page:", page);
-                            return (
-                                <button
-                                    key={page._id}
-                                    onClick={() => handlePageSelection(page._id)}
-                                    className="bg-blue-500 text-white font-semibold py-2 px-6 rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
-                                >
-                                    {page.page_no}: {page.page_name}
-                                </button>
-                            );
-                        })}
+                        {data.map((page) => (
+                            <button
+                                key={page.page_no} // Use page_no as the unique key
+                                onClick={() => handlePageSelection(page.page_no)}
+                                className="bg-blue-500 text-white font-semibold py-2 px-6 rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
+                            >
+                                {page.page_no}: {page.page_name}
+                            </button>
+                        ))}
                     </div>
 
                     {/* PageCard component for the selected page */}
-                    {selectedPageId && (
+                    {selectedPageId !== null && (
                         <div className="mt-6">
-                            <PageCard data={data.find((page) => page._id === selectedPageId)} />
+                            <PageCard data={data.filter((page) => page.page_no === selectedPageId)} />
                         </div>
                     )}
                 </div>

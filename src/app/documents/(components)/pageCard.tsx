@@ -1,89 +1,127 @@
-import React from 'react';
+"use client"; // Mark this as a client component
 
-// Interfaces
+import React from "react";
+import { useRouter } from "next/navigation";
+
 interface Document {
-    document_no: number;
-    document_name: string;
-    document: string; // HTML content as a string
-}
-
-interface Layer {
-    group_no?: number; // Optional for grouped layers
-    group_name?: string; // Name of the group (only for grouped layers)
-    content?: Document[]; // Array of documents (only for grouped layers)
-    document_no?: number; // Optional for standalone layers
-    document_name?: string; // Name of the standalone document
-    document?: string; // Content of the standalone document
-}
-
-interface PageData {
     _id: string;
     projectId: string;
     page_no: number;
     page_name: string;
-    layers: Layer[]; // Array of layers (can be grouped or standalone)
+    order: number;
+    group_no?: number; // Optional for grouped layers
+    group_name?: string; // Name of the group (only for grouped layers)
+    document_no: number;
+    document_name: string;
+    document: string;
+    createdAt: string;
+    updatedAt: string;
 }
 
-// Component
-const PageCard = ({ data }: { data: PageData | PageData[] }) => {
-    // Ensure data is always an array
-    const dataArray = Array.isArray(data) ? data : [data];
+interface Page {
+    page_no: number;
+    page_name: string;
+    documents: Document[];
+}
 
-    // Function to render a single document card
+interface PageCardProps {
+    data: Page[];
+}
+
+const PageCard = ({ data }: PageCardProps) => {
+    const router = useRouter();
+
     const renderSingleCard = (document: Document) => {
         return (
             <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
                 <h3 className="text-xl font-semibold mb-3">{document.document_name}</h3>
                 {/* Render the HTML string */}
-                <div className="prose prose-sm max-w-full" dangerouslySetInnerHTML={{ __html: document.document }} />
+                <div
+                    className="prose prose-sm max-w-full"
+                    dangerouslySetInnerHTML={{ __html: document.document }}
+                />
+                {/* Button to navigate to the document */}
+                <button
+                    // onClick={() => router.push(`/documents/${document._id}`)}
+                    className="mt-4 bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none"
+                >
+                    View Full Document
+                </button>
             </div>
         );
     };
 
-    // Function to render a grouped card
-    const renderGroupedCard = (layer: Layer) => {
+    const renderGroupedCard = (groupName: string, documents: Document[]) => {
+        console.log("documents", documents)
         return (
             <div className="bg-gray-100 rounded-lg shadow-lg p-6 mb-4">
-                <h3 className="text-2xl font-semibold mb-4">{layer.group_name}</h3>
-                {layer.content?.map((doc, index) => (
+                <h3 className="text-2xl font-semibold mb-4">{groupName}</h3>
+                {documents.map((doc, index) => (
                     <div key={index} className="bg-white rounded-lg shadow-md p-4 mb-3">
                         <h4 className="text-lg font-semibold mb-2">{doc.document_name}</h4>
                         {/* Render the HTML string */}
-                        <div className="prose prose-sm max-w-full" dangerouslySetInnerHTML={{ __html: doc.document }} />
+                        <div
+                            className="prose prose-sm max-w-full"
+                            dangerouslySetInnerHTML={{ __html: doc.document }}
+                        />
+
+                        {/* Button to navigate to the document */}
+                        <button
+                            onClick={() => {
+                                console.log('Document ID:', doc._id);  // Log the document ID here
+                                router.push(`/documents/${doc._id}`);
+                            }}
+                            className="mt-4 bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none"
+                        >
+                            View Full Document id
+                        </button>
                     </div>
                 ))}
             </div>
         );
     };
 
-    // Main render
     return (
         <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-            {dataArray.map((page, pageIndex) => (
+            {data.map((page, pageIndex) => (
                 <div key={pageIndex} className="mb-12">
-                    <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">{page.page_name}</h1>
+                    {/* Page Title */}
+                    <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">
+                        {page.page_name}
+                    </h1>
 
-                    {page.layers.map((layer, layerIndex) => {
-                        // Render grouped layers with `group_name` and `content`
-                        if (layer.group_name && layer.content) {
-                            return <div key={layerIndex}>{renderGroupedCard(layer)}</div>;
-                        }
+                    {(() => {
+                        const groupedDocuments: { [key: string]: Document[] } = {};
+                        const standaloneDocuments: Document[] = [];
 
-                        // Render standalone layers with `document_name` and `document`
-                        if (!layer.group_name && layer.document_name && layer.document) {
-                            return (
-                                <div key={layer.document_no}>
-                                    {renderSingleCard({
-                                        document_no: layer.document_no!,
-                                        document_name: layer.document_name,
-                                        document: layer.document,
-                                    })}
-                                </div>
-                            );
-                        }
+                        // Group documents by `group_name` or add to standalone list
+                        page.documents.forEach((doc) => {
+                            if (doc.group_name) {
+                                if (!groupedDocuments[doc.group_name]) {
+                                    groupedDocuments[doc.group_name] = [];
+                                }
+                                groupedDocuments[doc.group_name].push(doc);
+                            } else {
+                                standaloneDocuments.push(doc);
+                            }
+                        });
 
-                        return null; // Skip invalid layers
-                    })}
+                        return (
+                            <>
+                                {/* Render grouped documents */}
+                                {Object.keys(groupedDocuments).map((groupName, groupIndex) => (
+                                    <div key={groupIndex}>
+                                        {renderGroupedCard(groupName, groupedDocuments[groupName])}
+                                    </div>
+                                ))}
+
+                                {/* Render standalone documents */}
+                                {standaloneDocuments.map((doc) => (
+                                    <div key={doc.document_no}>{renderSingleCard(doc)}</div>
+                                ))}
+                            </>
+                        );
+                    })()}
                 </div>
             ))}
         </div>
